@@ -13,7 +13,7 @@
   <script>
     async function fetchData() {
       const url = document.getElementById("url").value;
-      const workerUrl = "https://your-worker.username.workers.dev/?url=" + encodeURIComponent(url);
+      const workerUrl = "https:/https://cloudflare-proxy-backend.caleb-martinez.workers.dev/?url=" + encodeURIComponent(url);
       
       try {
         const res = await fetch(workerUrl);
