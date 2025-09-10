@@ -1,1 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Proxy Failover</title>
+</head>
+<body>
+  <h1>Proxy Fetch with Failover</h1>
+  <input id="url" placeholder="Enter URL" size="50">
+  <button onclick="getData()">Fetch</button>
+  <pre id="out"></pre>
 
+  <script>
+    async function getData() {
+      const url = document.getElementById("url").value;
+      const endpoints = [
+        `https://your-proxy.onrender.com/proxy?url=${encodeURIComponent(url)}`,
+        `https://your-worker.username.workers.dev/?url=${encodeURIComponent(url)}`
+      ];
+
+      let result = null;
+      for (const ep of endpoints) {
+        try {
+          const res = await fetch(ep);
+          if (res.ok) {
+            result = await res.text();
+            break;
+          }
+        } catch (e) {
+          console.log("Failed:", ep, e);
+        }
+      }
+
+      document.getElementById("out").textContent = result || "All endpoints failed.";
+    }
+  </script>
+</body>
+</html>
