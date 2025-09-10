@@ -2,36 +2,26 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Proxy Failover</title>
+  <title>Cloudflare Proxy Demo</title>
 </head>
 <body>
-  <h1>Proxy Fetch with Failover</h1>
-  <input id="url" placeholder="Enter URL" size="50">
-  <button onclick="getData()">Fetch</button>
-  <pre id="out"></pre>
+  <h1>Cloudflare Proxy Demo</h1>
+  <input id="url" placeholder="Enter URL" style="width:400px;">
+  <button onclick="fetchData()">Fetch</button>
+  <pre id="output" style="white-space: pre-wrap; border:1px solid #ccc; padding:10px; max-width:600px;"></pre>
 
   <script>
-    async function getData() {
+    async function fetchData() {
       const url = document.getElementById("url").value;
-      const endpoints = [
-        `https://your-proxy.onrender.com/proxy?url=${encodeURIComponent(url)}`,
-        `https://your-worker.username.workers.dev/?url=${encodeURIComponent(url)}`
-      ];
-
-      let result = null;
-      for (const ep of endpoints) {
-        try {
-          const res = await fetch(ep);
-          if (res.ok) {
-            result = await res.text();
-            break;
-          }
-        } catch (e) {
-          console.log("Failed:", ep, e);
-        }
+      const workerUrl = "https://your-worker.username.workers.dev/?url=" + encodeURIComponent(url);
+      
+      try {
+        const res = await fetch(workerUrl);
+        const text = await res.text();
+        document.getElementById("output").textContent = text;
+      } catch (err) {
+        document.getElementById("output").textContent = "Error: " + err.message;
       }
-
-      document.getElementById("out").textContent = result || "All endpoints failed.";
     }
   </script>
 </body>
