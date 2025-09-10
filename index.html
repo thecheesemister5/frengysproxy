@@ -2,27 +2,89 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Cloudflare Proxy Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cloudflare Proxy Frontend</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #0b0c10;
+      color: #c5c6c7;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    h1 {
+      color: #66fcf1;
+      margin-bottom: 1rem;
+    }
+
+    input[type="text"] {
+      width: 400px;
+      padding: 0.5rem;
+      border: 1px solid #45a29e;
+      border-radius: 4px;
+      background: #1f2833;
+      color: #c5c6c7;
+      margin-right: 0.5rem;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      background: #45a29e;
+      border: none;
+      border-radius: 4px;
+      color: #0b0c10;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #66fcf1;
+    }
+
+    iframe {
+      width: 100%;
+      height: 80vh;
+      border: 2px solid #45a29e;
+      margin-top: 1rem;
+      border-radius: 4px;
+      background: #1f2833;
+    }
+
+    .container {
+      max-width: 1000px;
+      width: 100%;
+    }
+  </style>
 </head>
 <body>
-  <h1>Cloudflare Proxy Demo</h1>
-  <input id="url" placeholder="Enter URL" style="width:400px;">
-  <button onclick="fetchData()">Fetch</button>
-  <pre id="output" style="white-space: pre-wrap; border:1px solid #ccc; padding:10px; max-width:600px;"></pre>
+  <div class="container">
+    <h1>Cloudflare Proxy Browser</h1>
+    <div>
+      <input id="urlInput" type="text" placeholder="Enter URL (e.g. https://example.com)">
+      <button onclick="loadProxy()">Go</button>
+    </div>
+    <iframe id="proxyFrame" src=""></iframe>
+  </div>
 
   <script>
-    async function fetchData() {
-      const url = document.getElementById("url").value;
-      const workerUrl = "https:/https://cloudflare-proxy-backend.caleb-martinez.workers.dev/?url=" + encodeURIComponent(url);
-      
-      try {
-        const res = await fetch(workerUrl);
-        const text = await res.text();
-        document.getElementById("output").textContent = text;
-      } catch (err) {
-        document.getElementById("output").textContent = "Error: " + err.message;
-      }
+    const workerBase = "https://cloudflare-proxy-backend.caleb-martinez.workers.dev/";
+
+    function loadProxy() {
+      const url = document.getElementById("urlInput").value.trim();
+      if (!url) return;
+
+      const proxyUrl = `${workerBase}?url=${encodeURIComponent(url)}`;
+      document.getElementById("proxyFrame").src = proxyUrl;
     }
+
+    // Optional: press Enter to load
+    document.getElementById("urlInput").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") loadProxy();
+    });
   </script>
 </body>
 </html>
