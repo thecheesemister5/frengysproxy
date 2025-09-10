@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cloudflare Proxy Frontend</title>
+  <title>Cloudflare Proxy Browser</title>
   <style>
     body {
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -45,7 +45,12 @@
       background: #66fcf1;
     }
 
-    iframe {
+    .container {
+      max-width: 1000px;
+      width: 100%;
+    }
+
+    #proxyFrame {
       width: 100%;
       height: 80vh;
       border: 2px solid #45a29e;
@@ -54,9 +59,11 @@
       background: #1f2833;
     }
 
-    .container {
-      max-width: 1000px;
-      width: 100%;
+    #loading {
+      margin-top: 1rem;
+      color: #66fcf1;
+      font-weight: bold;
+      display: none;
     }
   </style>
 </head>
@@ -64,24 +71,48 @@
   <div class="container">
     <h1>Cloudflare Proxy Browser</h1>
     <div>
-      <input id="urlInput" type="text" placeholder="Enter URL (e.g. https://example.com)">
+      <input id="urlInput" type="text" placeholder="Enter URL (e.g. poki.com)">
       <button onclick="loadProxy()">Go</button>
     </div>
+    <div id="loading">Loading...</div>
     <iframe id="proxyFrame" src=""></iframe>
   </div>
 
   <script>
     const workerBase = "https://cloudflare-proxy-backend.caleb-martinez.workers.dev/";
 
-    function loadProxy() {
-      const url = document.getElementById("urlInput").value.trim();
-      if (!url) return;
-
-      const proxyUrl = `${workerBase}?url=${encodeURIComponent(url)}`;
-      document.getElementById("proxyFrame").src = proxyUrl;
+    function normalizeUrl(url) {
+      url = url.trim();
+      // Add https:// if missing
+      if (!/^https?:\/\//i.test(url)) {
+        url = "https://" + url;
+      }
+      return url;
     }
 
-    // Optional: press Enter to load
+    function loadProxy() {
+      const input = document.getElementById("urlInput").value;
+      if (!input) return;
+
+      const normalizedUrl = normalizeUrl(input);
+      const proxyUrl = `${workerBase}?url=${encodeURIComponent(normalizedUrl)}`;
+
+      const iframe = document.getElementById("proxyFrame");
+      const loading = document.getElementById("loading");
+
+      // Show loading
+      loading.style.display = "block";
+
+      // Load iframe
+      iframe.src = proxyUrl;
+
+      // Hide loading when iframe finishes loading
+      iframe.onload = () => {
+        loading.style.display = "none";
+      };
+    }
+
+    // Press Enter to load
     document.getElementById("urlInput").addEventListener("keypress", function(e) {
       if (e.key === "Enter") loadProxy();
     });
